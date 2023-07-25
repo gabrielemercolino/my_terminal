@@ -1,3 +1,5 @@
+# **Not complete**
+
 # My Terminal
 
 This is my current setup of my terminal.
