@@ -1,58 +1,32 @@
 #!/bin/bash
 
-# Color variables
-red='\033[0;31m'
-green='\033[0;32m'
-yellow='\033[0;33m'
-blue='\033[0;34m'
-magenta='\033[0;35m'
-cyan='\033[0;36m'
-# Clear the color after that
-clear='\033[0m'
-
-function say(){
-  echo -e "$1"
-  echo ""
-}
-
-function install_brew(){
-  say "BREW"
-  # /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  message="${yellow}follow the instruction to finish the installation and re-run the script to continue ${clear}"
-  say "$message"
-  exit
-}
+. "global.sh"
 
 say "${cyan}Welcome to my shell setup.${clear}"
-
 sleep 1
+say "The script will check if the necessary packages are installed"
 
-# Check if brew is installed
-if ! command -v brew &> /dev/null
-then
-  say "Brew is not installed and it's required. Do you want to install it now? [Y/n]"
+check_command(){
+  # the command to check
+  command=$1
+  # some commands can't be installed directly, if that's the case it is possible to specify what to install. Defaults to the command itself
+  package=${2:-$1}
 
-  read response
-
-  if [[ $response == "" || $response == "y" || $response == "Y" ]]; then
-    say "installing brew..."
-    install_brew
-  else
-    say "As it's required the script can't continue"
-    exit
+  if ! command -v $command &> /dev/null
+  then
+    say "$command is not installed. Do you want to install it now? [Y/n]"
+    read response
+    if [[ "${response}" == @(""|"y"|"Y") ]]; then
+      say "Installing $command..."
+      brew install $command
+    else
+      say "Not installing. The script will stop"
+      exit
+    fi
+  #else
+  # say "$command already installed"
   fi
-fi
+}
 
-# check if git is installed
-if ! command -v git &> /dev/null
-then
-  say "Git is not installed. Do you want to install it now? [Y/n]"
-  read response
-  if [[ $response == "" || $response == "y" || $response == "Y" ]]; then
-    message="installing brew..."
-    say "Installing git"
-    brew install git
-  else
-    say "Skipping git installation"
-  fi
-fi
+check_command git
+check_command gum
